@@ -1,27 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <pthread.h>
 #include <math.h>
+#include <time.h>
 
-int vehicle_num;
-int *vehicle_arr;
-int *vehicle_progress; 
-int *visited;
-pthread_t tid[4];
-int passed_num[4];
-int tick;
-int limit;
-int status;
-int passed_vehicle;
-int current_vehicle;
-int current_index;
-int total;
+int vehicle_num;          //전체 차량의 수
+int *vehicle_arr;         //랜덤으로 생성한 차량의 배열
+int *vehicle_progress;    //차량의 진행과정 (1초, 2초 진행여부)
+int *visited;             //차량의 도착여부
+int passed_num[4];        //각 출발점마다 총 진행된 차량의 수
+int tick;                 //시간
+int limit;              
+int status;               
+int passed_vehicle;       //현재시간에 도착한 차량
+int current_vehicle;      //현재 진행되고 있는 차량
+int current_index;        //vehicle_arr에서 현재 진행되고 있는 차량의 index
+int total;                //현재 도착한 전체 차량
 
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_t tid[4];         //4개의 thread ID 주소공간
 
-pthread_cond_t cond_main = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;           //mutex lock 생성과 동시에 정적초기화
+
+pthread_cond_t cond_main = PTHREAD_COND_INITIALIZER;         //main thread, 4개의 thread의 조건변수
 pthread_cond_t cond[4] = {
 	PTHREAD_COND_INITIALIZER,
 	PTHREAD_COND_INITIALIZER,
@@ -42,7 +43,8 @@ int main(int argc, char *argv[]) {
 	vehicle_arr=(int*)malloc(sizeof(int)*vehicle_num);
 	vehicle_progress=(int*)malloc(sizeof(int)*vehicle_num);
 	visited=(int*)malloc(sizeof(int)*vehicle_num);
-	
+	srand(time(NULL));
+
 	printf("Total number of vehicles : %d\n", vehicle_num);
 	printf("Start point : ");
 	for(int i=0; i<vehicle_num; i++) {
@@ -128,6 +130,17 @@ int main(int argc, char *argv[]) {
 		pthread_mutex_unlock(&mutex);
 	}
 
+	//4개의 thread 종료
+	for(int i=0; i<4; i++) {
+		pthread_cond_signal(&cond[i]);
+	}
+
+	//mutex와 조건변수 해제
+	pthread_mutex_destroy(&mutex);
+	pthread_cond_destroy(&cond_main);
+	for(int i=0; i<4; i++) {
+		pthread_cond_destroy(&cond[i]);
+	}
 
 	printf("Number of vehicles passed from each start point\n");
 	for(int i=0; i<4; i++) {
