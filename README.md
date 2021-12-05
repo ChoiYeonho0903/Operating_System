@@ -11,12 +11,12 @@ ps 명령어 구현
 lscpu 명령어 구현
 
 ## 4. System Call
-(1) 시스템 콜 테이블 등록
-(2) 시스템 콜 헤더 파일에 등록
-(3) 시스템 콜 함수 구현
-  (i) sys_myadd.c : +
-  (ii) sys_mysubtract.c : -
-  (iii) sys_mymultiply.c : *
-  (iV) sys_mymodular.c : %
-(4) Makefile에 등록
++ 시스템 콜 테이블 등록
++ 시스템 콜 헤더 파일에 등록
++ 시스템 콜 함수 구현
+  + sys_myadd.c : +
+  + sys_mysubtract.c : -
+  + sys_mymultiply.c : *
+  + sys_mymodular.c : %
++ Makefile에 등록
 
